@@ -1,0 +1,71 @@
+#header{
+    background-color: rgb(0, 0, 0);
+    color:white;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 15px;
+    text-align: center;
+    padding-top: 5px;
+}
+#laptops{
+   padding: 5px;
+   border: none;
+}
+#login{
+    color: black;
+    text-decoration: none;
+}
+#register{
+    color: black;
+    text-decoration: none;
+}
+.category a{
+    text-decoration: none;
+    color: white;
+}
+
+.nav-item .nav-link{
+    color: white;
+ }
+.navbar-nav .nav-item .dropdown-menu {
+    display: none;
+    color: black;
+  }
+
+.nav-item:hover .dropdown-menu {
+    display: block;
+    background-color: gray;
+  }
+
+  .carousel-item img {
+    height: 500px;
+    line-height: 500px;
+    object-fit: cover;
+}
+footer{
+    margin-top: 20px;
+    margin-left: 200px;
+
+}
+footer .fqa  a{
+
+    text-decoration: none;
+    color: rgb(47, 45, 45);
+}
+footer .fqa li{
+    list-style-type: none;
+}
+footer .about{
+    text-align: justify;
+}
+footer p{
+    font-size: 15px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.form-error{
+    color:red;
+    font-weight: bold;
+    font-size: 15px;
+}
+td a{
+    text-decoration: none;
+}
