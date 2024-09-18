@@ -14,6 +14,7 @@ use DB;
 use Hash;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Phpml\Clustering\KMeans;
 
 class FrontendController extends Controller
 {
@@ -79,8 +80,37 @@ class FrontendController extends Controller
             $query = $query->where('price', '>=', $min)
                 ->where('price', '<=', $max);
         }
-        $query = $query->get();
-        // dd($query);
-        return view('frontend.pages.product-filter')->with(['products' => $query]);
+        $products = $query->get();
+        // dd($products);
+
+        // Prepare data for clustering
+        $data = [];
+        foreach ($products as $product) {
+            $data[] = [
+                $product->price,
+            ];
+        }
+
+        $kmeans = new KMeans(3);
+        $clusters = $kmeans->cluster($data);
+
+        $clusterPrices = [];
+        foreach ($clusters as $cluster) {
+            $totalPrice = 0;
+            foreach ($cluster as $product) {
+                $totalPrice += $product[0];
+            }
+            $averagePrice = $totalPrice / count($cluster);
+            $clusterPrices[] = $averagePrice;
+        }
+
+        $tolerance = 50;
+        $result = Product::select('*')->where('status', 'active')->where(function ($q) use ($clusterPrices, $tolerance) {
+            foreach ($clusterPrices as $price) {
+                $q->orWhereBetween('price', [$price - $tolerance, $price + $tolerance]);
+            }
+        })->get();
+        // dd($result->toArray());
+        return view('frontend.pages.product-filter')->with(['products' => $result]);
     }
 }
