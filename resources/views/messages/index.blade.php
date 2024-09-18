@@ -16,6 +16,7 @@
           <th scope="col">Name</th>
           <th scope="col">Message</th>
           <th scope="col">Date</th>
+          <th scope="col">Sentiment</th>
           <th scope="col">Action</th>
         </tr>
       </thead>
@@ -27,6 +28,7 @@
           <td>{{$message->name}} {{$message->read_at}}</td>
           <td>{{$message->message}}</td>
           <td>{{$message->created_at->format('F d, Y h:i A')}}</td>
+          <td>{{$message->sentiment}}</td>
           <td>
             <a href="{{route('messages.show',$message->id)}}">
                 <button class="btn">
@@ -56,7 +58,7 @@
   </div>
 </div>
 
-<div class="card">
+{{-- <div class="card">
 
   <h5 class="card-header">Bad Messages</h5>
   <div class="card-body">
@@ -106,7 +108,7 @@
       <h2>Messages Empty!</h2>
     @endif
   </div>
-</div>
+</div> --}}
 @endsection
 <script>
     document.addEventListener('DOMContentLoaded', function () {

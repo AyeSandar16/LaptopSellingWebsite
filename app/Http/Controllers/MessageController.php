@@ -17,36 +17,15 @@ class MessageController extends Controller
      */
     public function index()
     {
-
-        $good_messages = [
-            'good',
-            'fast',
-            'reliable'
-        ];
-
-        $bad_messages = [
-            'Delays',
-            'Low-quality images',
-            'Unhelpful'
-        ];
-
-        $query = Message::query();
-
-        // Loop through each good message and add a `where` clause with `LIKE`
-        foreach ($good_messages as $good_message) {
-            $query->orWhere('message', 'LIKE', '%' . $good_message . '%');
+        $review = new Message();
+        $comments =  $review->paginate(10);
+        foreach ($comments as $comment) {
+            $sentiment = $this->analyzeSentiment($comment->message);
+            $comment->sentiment = $sentiment;
+            $comment->save();
         }
 
-        // Paginate the result
-        $goodMessages = $query->paginate(20);
-
-        $badQuery = Message::query();
-        foreach ($bad_messages as $bad_message) {
-            $badQuery->orWhere('message', 'LIKE', '%' . $bad_message . '%');
-        }
-        $badMessages = $badQuery->paginate(20);
-
-        return view('messages.index')->with(['goodMessages' => $goodMessages, 'badMessages' => $badMessages]);
+        return view('messages.index')->with(['goodMessages' => $comments]);
     }
     public function messageFive()
     {
@@ -159,5 +138,41 @@ class MessageController extends Controller
             request()->session()->flash('error', 'Error occurred please try again');
         }
         return back();
+    }
+
+    private function cleanText($text)
+    {
+        return preg_replace('/[^a-zA-Z0-9\s]/', '', strtolower($text));
+    }
+
+    private function tokenize($text)
+    {
+        return explode(' ', $text);
+    }
+
+    private function removeStopWords($tokens)
+    {
+        $stopWords = ['and', 'the', 'is', 'in', 'to', 'for', 'on', 'a'];
+        return array_diff($tokens, $stopWords);
+    }
+
+    private function analyzeSentiment($comment)
+    {
+        $positiveWords = ['good', 'great', 'excellent', 'fantastic', 'love'];
+        $negativeWords = ['bad', 'terrible', 'hate', 'poor', 'awful'];
+
+        $cleanedComment = $this->cleanText($comment);
+        $tokens = $this->tokenize($cleanedComment);
+        $tokens = $this->removeStopWords($tokens);
+
+        $score = 0;
+        foreach ($tokens as $token) {
+            if (in_array($token, $positiveWords)) {
+                $score++;
+            } elseif (in_array($token, $negativeWords)) {
+                $score--;
+            }
+        }
+        return $score > 0 ? 'positive' : ($score < 0 ? 'negative' : 'neutral');
     }
 }
