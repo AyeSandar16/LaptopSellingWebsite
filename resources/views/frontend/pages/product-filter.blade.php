@@ -6,7 +6,7 @@
     <div class="row g-0">
 
     @if ($products->isEmpty())
-        <p>No products found for '{{ $searchTerm }}'</p>
+        <p>Products not found</p>
     @else
         <div class="row mt-3">
             @foreach ($products as $product)

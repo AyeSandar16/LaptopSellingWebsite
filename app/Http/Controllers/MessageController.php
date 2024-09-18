@@ -1,10 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Auth;
 use Illuminate\Http\Request;
 use App\Models\Message;
 use App\Events\MessageSent;
+use Illuminate\Support\Str;
+
 class MessageController extends Controller
 {
     /**
@@ -12,13 +15,42 @@ class MessageController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(){
-        $messages=Message::paginate(20);
-        return view('messages.index')->with('messages',$messages);
+    public function index()
+    {
+
+        $good_messages = [
+            'good',
+            'fast',
+            'reliable'
+        ];
+
+        $bad_messages = [
+            'Delays',
+            'Low-quality images',
+            'Unhelpful'
+        ];
+
+        $query = Message::query();
+
+        // Loop through each good message and add a `where` clause with `LIKE`
+        foreach ($good_messages as $good_message) {
+            $query->orWhere('message', 'LIKE', '%' . $good_message . '%');
+        }
+
+        // Paginate the result
+        $goodMessages = $query->paginate(20);
+
+        $badQuery = Message::query();
+        foreach ($bad_messages as $bad_message) {
+            $badQuery->orWhere('message', 'LIKE', '%' . $bad_message . '%');
+        }
+        $badMessages = $badQuery->paginate(20);
+
+        return view('messages.index')->with(['goodMessages' => $goodMessages, 'badMessages' => $badMessages]);
     }
     public function messageFive()
     {
-        $message=Message::whereNull('read_at')->limit(5)->get();
+        $message = Message::whereNull('read_at')->limit(5)->get();
         return response()->json($message);
     }
 
@@ -39,14 +71,14 @@ class MessageController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-{
-    // Validate the incoming request data
-    $validatedData = $request->validate([
-        'name' => 'required|string|min:2',
-        'email' => 'required|email',
-        'phone' => 'required|string',
-        'message' => 'required|string',
-    ]);
+    {
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'name' => 'required|string|min:2',
+            'email' => 'required|email',
+            'phone' => 'required|string',
+            'message' => 'required|string',
+        ]);
 
 
         // Create a new Message instance
@@ -66,8 +98,7 @@ class MessageController extends Controller
 
         // Redirect back to the homepage or any other appropriate page
         return redirect()->route('home.index');
-
-}
+    }
 
 
 
@@ -77,15 +108,14 @@ class MessageController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request,$id)
+    public function show(Request $request, $id)
     {
-        $message=Message::find($id);
-        if($message){
+        $message = Message::find($id);
+        if ($message) {
             // $message->read_at=\Carbon\Carbon::now();
             $message->save();
-            return view('messages.show')->with('message',$message);
-        }
-        else{
+            return view('messages.show')->with('message', $message);
+        } else {
             return back();
         }
     }
@@ -121,13 +151,12 @@ class MessageController extends Controller
      */
     public function destroy($id)
     {
-        $message=Message::find($id);
-        $status=$message->delete();
-        if($status){
-            request()->session()->flash('success','Successfully deleted message');
-        }
-        else{
-            request()->session()->flash('error','Error occurred please try again');
+        $message = Message::find($id);
+        $status = $message->delete();
+        if ($status) {
+            request()->session()->flash('success', 'Successfully deleted message');
+        } else {
+            request()->session()->flash('error', 'Error occurred please try again');
         }
         return back();
     }
