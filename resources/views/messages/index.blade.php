@@ -6,7 +6,7 @@
 
 <div class="card">
 
-  <h5 class="card-header">Messages</h5>
+  <h5 class="card-header">Good Messages</h5>
   <div class="card-body">
     @if(count($goodMessages)>0)
     <table class="table message-table" id="message-dataTable">
@@ -58,7 +58,7 @@
 
 <div class="card">
 
-  <h5 class="card-header">Messages</h5>
+  <h5 class="card-header">Bad Messages</h5>
   <div class="card-body">
     @if(count($badMessages)>0)
     <table class="table message-table" id="message-dataTable">
