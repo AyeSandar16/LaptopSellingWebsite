@@ -71,7 +71,7 @@ class FrontendController extends Controller
         $min = $request->minPrice;
         $max = $request->maxPrice;
 
-        $query = Product::select('*')->where('status', 'active');
+        $query = Product::select('price')->where('status', 'active');
         if (!is_null($min) && is_null($max)) {
             $query = $query->where('price', '>=', $min);
         } elseif (is_null($min) && !is_null($max)) {
@@ -81,7 +81,7 @@ class FrontendController extends Controller
                 ->where('price', '<=', $max);
         }
         $products = $query->get();
-        // dd($products);
+        // dd($products->toArray());
 
         // Prepare data for clustering
         $data = [];
