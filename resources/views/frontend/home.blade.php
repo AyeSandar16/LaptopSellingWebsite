@@ -41,6 +41,14 @@ $products=DB::table('products')->where('status','active')->get();
                 </div>
             </div>
         </div>
+        <div class="text-center m-4 p-2">
+            <h3 class="mb-3">Min - Max Amount</h3>
+            <form action="{{ route('product.filterPrice') }}" method="GET">
+                <input type="number" name="minPrice" id="" class="form-control" placeholder="minimum price"> -
+                <input type="number" name="maxPrice" id="" class="form-control" placeholder="maximun price">
+                <button type="submit" class="btn bg-dark text-white">Search <i class="fa fa-search"></i></button>
+            </form>
+        </div>
         <div class="row">
             @foreach($products as $product)
                 @if($product->condition == 'hot')
